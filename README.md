@@ -15,6 +15,12 @@ please see check their docstrings for details):
 - `projectiny-find-file-in`
 - `projectiny-find-file-all`
 
+By design, projectiny doesn't automatically search for existing projects as you
+use Emacs. You have to explicitly add to the list of known projects by either
+using the provided commands or editing the known projects file. (Notice you can
+still add some sort of automatic project recognition by creating hooks on the
+functions you desire, though not being the aim of the project)
+
 You can configure the file that projectiny uses to save its known projects via
 the custom variable `projectiny-known-projects-file`.
 
