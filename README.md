@@ -1,20 +1,22 @@
 # projectiny.el
 
-This package provides very basic functionalities for bookmarking and searching
-in projects. Its goals are minimalism and use of Emacs' built-in libraries such
-as `project.el`.
+This package provides basic functionalities for creating a list of known
+projects and quickly opening files in them. Its goals are minimalism,
+modularity, and the use of Emacs' built-in libraries (`project.el`).
 
 ## Overview
 
-Projectiny interactive functions are (mostly are self-descriptive, but please
-see their documentation for further details):
+List of projectiny's interactive functions (mostly are self-descriptive, but
+please see check their docstrings for details):
 
-- `projectiny-add-bookmark`
-- `projectiny-edit-bookmarks`
+- `projectiny-add-project`
+- `projectiny-edit-known-projects`
+- `projectiny-find-file`
 - `projectiny-find-file-in`
 - `projectiny-find-file-all`
 
-You can configure the file that projectiny uses to save its bookmarks via the custom variable `projectiny-bookmarks-file`.
+You can configure the file that projectiny uses to save its known projects via
+the custom variable `projectiny-known-projects-file`.
 
 ## Installation
 

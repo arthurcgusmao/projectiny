@@ -1,4 +1,4 @@
-;;; projectiny.el --- Simple project bookmarking for Emacs -*- lexical-binding: t -*-
+;;; projectiny.el --- Basic project management for Emacs -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2020  Arthur Colombini Gusmao
 
@@ -25,26 +25,27 @@
 
 ;;; Commentary:
 
-;; This package provides very basic functionalities for bookmarking and
-;; searching projects. Its goals are minimalism and use of Emacs' built-in
-;; libraries such as `project.el`.
+;; This package provides basic functionalities for creating a list of known
+;; projects and quickly opening files in them. Its goals are minimalism,
+;; modularity, and the use of Emacs' built-in libraries (`project.el`).
 
 ;;; Code:
 
 (require 'project)
 
 
-(defcustom projectiny-bookmarks-file
-  (expand-file-name "projectiny-bookmarks"
+(defcustom projectiny-known-projects-file
+  (expand-file-name "projectiny-known-projects"
                     user-emacs-directory)
-  "File that references bookmarked projects.")
+  "File that references known projects.")
 
 
-(defun projectiny-add-bookmark ()
-  "Add a project (with completion) to the bookmarks file.
+(defun projectiny-add-project ()
+  "Add a project (with completion) to the known projects file.
 
-The completion defaults to the root of the current project, which
-uses `project-current' to provide a smart suggestion."
+The completion provides a smart suggestion that defaults to the
+root of the project where the user is (when applicable), by
+leveraging on `project-current'."
   (interactive)
   (let* ((default-dir (cdr (project-current nil)))
          (proj-dir
@@ -57,29 +58,31 @@ uses `project-current' to provide a smart suggestion."
     ;; Write modified list to file
     (with-temp-buffer
       (insert (mapconcat 'identity known-projects "\n"))
-      (write-file projectiny-bookmarks-file))))
+      (write-file projectiny-known-projects-file))))
 
-(defun projectiny-edit-bookmarks ()
-  "Open the `projectiny-bookmarks-file' for editing.
+(defun projectiny-edit-known-projects ()
+  "Open `projectiny-known-projects-file' for editing.
 
 Each line of the file should contain a directory path that
-correspond to root directory of a project the user want to
-bookmark."
+correspond to the root directory of a project the user wants
+projectiny to remember."
   (interactive)
-  (find-file projectiny-bookmarks-file))
+  (find-file projectiny-known-projects-file))
+
 
 (defun projectiny--read-known-projects ()
   "Read the list of known projects from
-`projectiny-bookmarks-file'."
-  (when (file-exists-p projectiny-bookmarks-file)
+`projectiny-known-projects-file'."
+  (when (file-exists-p projectiny-known-projects-file)
     (with-temp-buffer
-      (insert-file-contents projectiny-bookmarks-file)
+      (insert-file-contents projectiny-known-projects-file)
       (split-string (buffer-string) "\n" t))))
 
 (defun projectiny--choose-project ()
   "Prompt the user to choose a project from the known list, and
-return its root directory path. Shown paths are abbreviated to
-increase readability."
+return its root directory path.
+
+Shown paths are abbreviated to increase readability."
   (let ((default-directory ""))
     (expand-file-name
      (completing-read
@@ -96,13 +99,24 @@ instance rooted in it."
         (message "Using `%s' as a transient project root" dir)
         (setq pr (cons 'transient dir)))))
 
+
+(defun projectiny-find-file ()
+  "Wrapper around `project-find-file'. Visit a file (with
+completion) in the current project’s roots.
+
+The completion default is the filename at point, if one is
+recognized."
+  (interactive)
+  (project-find-file))
+
 (defun projectiny-find-file-in ()
   "Visit a file (with completion) in a project's roots.
 
 The completion default is the filename at point, if one is
 recognized."
   (interactive)
-  (let* ((default-directory (projectiny--choose-project)) ; Set default-directory to make further use of this variable meaningful
+  ;; Deliberately modify `default-directory' to enable later use of this variable
+  (let* ((default-directory (projectiny--choose-project))
          (pr (projectiny--project-get-instance default-directory))
          (dirs (project-roots pr)))
     (project-find-file-in (thing-at-point 'filename) dirs pr)))
