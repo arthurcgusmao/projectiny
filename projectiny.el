@@ -69,6 +69,19 @@ projectiny to remember."
   (interactive)
   (find-file projectiny-known-projects-file))
 
+(defun projectiny-clean-known-projects ()
+  "Remove unexisting paths from `projectiny-known-projects-file'."
+  (interactive)
+  (let ((known-projects (list)))
+    ;; Loop over known projects and store existing ones in list
+    (dolist (proj-dir (projectiny--read-known-projects))
+      (when (file-directory-p proj-dir)
+        (add-to-list 'known-projects proj-dir)))
+    ;; Write cleaned list to file
+    (with-temp-buffer
+      (insert (mapconcat 'identity known-projects "\n"))
+      (write-file projectiny-known-projects-file))))
+
 
 (defun projectiny--read-known-projects ()
   "Read the list of known projects from
