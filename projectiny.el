@@ -61,7 +61,10 @@ leveraging on `project-current'."
     ;; Write modified list to file
     (with-temp-buffer
       (insert (mapconcat 'identity known-projects "\n"))
-      (write-file projectiny-known-projects-file))))
+      (write-file projectiny-known-projects-file))
+    ;; Find file in newly added project. (Uses the value of default-directory,
+    ;; so no need to pass the project root as a parameter)
+    (projectiny-find-file)))
 
 (defun projectiny-edit-known-projects ()
   "Open `projectiny-known-projects-file' for editing.
