@@ -64,7 +64,8 @@ leveraging on `project-current'."
       (write-file projectiny-known-projects-file))
     ;; Find file in newly added project. (Uses the value of default-directory,
     ;; so no need to pass the project root as a parameter)
-    (projectiny-find-file)))
+    (let ((default-directory proj-dir))
+      (projectiny-find-file))))
 
 (defun projectiny-edit-known-projects ()
   "Open `projectiny-known-projects-file' for editing.
