@@ -117,7 +117,15 @@ instance rooted in it."
   (or (project--find-in-directory dir)
       (progn
         (message "Using `%s' as a transient project root" dir)
-        (setq pr (cons 'transient dir)))))
+        (cons 'transient dir))))
+
+(defun projectiny--project-get-root (&optional dir)
+  "Returns a project's root directory from one of
+its (sub)directories DIR.
+
+Defaults to `default-directory' when DIR is nil."
+  (project-root (projectiny--project-get-instance
+                 (or dir default-directory))))
 
 
 (defun projectiny-find-file ()
@@ -138,8 +146,8 @@ recognized."
   ;; Deliberately modify `default-directory' to enable later use of this variable
   (let* ((default-directory (projectiny--choose-project))
          (pr (projectiny--project-get-instance default-directory))
-         (dirs (project-roots pr)))
-    (project-find-file-in (thing-at-point 'filename) dirs pr)))
+         (dir (project-root pr)))
+    (project-find-file-in (thing-at-point 'filename) `(,dir) pr)))
 
 (defun projectiny-find-file-all ()
   "Visit a file (with completion) in all known projects.
