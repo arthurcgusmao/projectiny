@@ -47,7 +47,10 @@ The completion provides a smart suggestion that defaults to the
 root of the project where the user is (when applicable), by
 leveraging on `project-current'."
   (interactive)
-  (let* ((default-directory (cdr (project-current nil)))
+  (let* ((current-project (project-current nil))
+         (default-directory (if current-project
+                                (project-root current-project)
+                              default-directory))
          ;; Here I found that not using `default-directory' in the let function
          ;; makes its value be incorrectly modified on the buffer where the
          ;; user issued the command, due to how `read-directory-name' works.
