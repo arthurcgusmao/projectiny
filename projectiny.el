@@ -65,10 +65,8 @@ leveraging on `project-current'."
     (with-temp-buffer
       (insert (mapconcat 'identity known-projects "\n"))
       (write-file projectiny-known-projects-file))
-    ;; Find file in newly added project. (Uses the value of default-directory,
-    ;; so no need to pass the project root as a parameter)
-    (let ((default-directory proj-dir))
-      (projectiny-find-file))))
+    ;; Find file in newly added project.
+    (projectiny-find-file-in proj-dir)))
 
 (defun projectiny-edit-known-projects ()
   "Open `projectiny-known-projects-file' for editing.
@@ -140,14 +138,14 @@ recognized."
   (interactive)
   (project-find-file))
 
-(defun projectiny-find-file-in ()
+(defun projectiny-find-file-in (&optional dir)
   "Visit a file (with completion) in a project's roots.
 
 The completion default is the filename at point, if one is
 recognized."
   (interactive)
   ;; Deliberately modify `default-directory' to enable later use of this variable
-  (let* ((default-directory (projectiny--choose-project))
+  (let* ((default-directory (or dir (projectiny--choose-project)))
          (pr (projectiny--project-get-instance default-directory))
          (dir (project-root pr)))
     (project-find-file-in (thing-at-point 'filename) `(,dir) pr)))
