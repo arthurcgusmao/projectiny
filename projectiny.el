@@ -99,6 +99,20 @@ projectiny to remember."
       (insert-file-contents projectiny-known-projects-file)
       (split-string (buffer-string) "\n" t))))
 
+(defun projectiny--is-known-project (dir)
+  "Check the current directory is in the known project list."
+  (let ((search-dir (expand-file-name dir))
+        (final-dir nil)
+        (known-projects (projectiny--read-known-projects)))
+    (while (not (string= search-dir "/"))
+      (message "trying `%s' as root" search-dir)
+      (if (member search-dir known-projects)
+          (setq final-dir search-dir
+                search-dir "/")
+        (setq search-dir
+              (file-name-directory (directory-file-name search-dir)))))
+    final-dir))
+
 (defun projectiny--choose-project ()
   "Prompt the user to choose a project from the known list, and
 return its root directory path.
@@ -116,9 +130,11 @@ Shown paths are abbreviated to increase readability."
 part of a detectable project, return a `transient' project
 instance rooted in it."
   (or (project--find-in-directory dir)
-      (progn
-        (message "Using `%s' as a transient project root" dir)
-        (cons 'transient dir))))
+      (let ((dir (or (projectiny--is-known-project dir)
+                     dir)))
+        (progn
+          (message "Using `%s' as a transient project root" dir)
+          (cons 'transient dir)))))
 
 (defun projectiny--project-get-root (&optional dir)
   "Returns a project's root directory from one of
@@ -130,13 +146,13 @@ Defaults to `default-directory' when DIR is nil."
 
 
 (defun projectiny-find-file ()
-  "Wrapper around `project-find-file'. Visit a file (with
-completion) in the current project’s roots.
+  "Wrapper around `projectiny-find-file-in'. Visit a file
+(with completion) in the current project’s roots.
 
 The completion default is the filename at point, if one is
 recognized."
   (interactive)
-  (project-find-file))
+  (projectiny-find-file-in default-directory))
 
 (defun projectiny-find-file-in (&optional dir)
   "Visit a file (with completion) in a project's roots.
