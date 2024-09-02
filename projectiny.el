@@ -136,14 +136,14 @@ instance rooted in it."
           (message "Using `%s' as a transient project root" dir)
           (cons 'transient dir)))))
 
-(defun projectiny--project-get-root (&optional dir)
-  "Returns a project's root directory from one of
-its (sub)directories DIR.
+(defun projectiny--project-get-root (&optional path)
+  "Returns a project's root directory from one of its
+subpaths PATH.
 
-Defaults to `default-directory' when DIR is nil."
-  (project-root (projectiny--project-get-instance
-                 (or dir default-directory))))
-
+Defaults to `default-directory' when PATH is nil."
+  (let ((path (or path default-directory)))
+    (project-root (projectiny--project-get-instance
+                   (file-name-directory path)))))
 
 (defun projectiny-find-file ()
   "Wrapper around `projectiny-find-file-in'. Visit a file
